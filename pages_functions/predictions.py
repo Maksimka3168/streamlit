@@ -17,19 +17,52 @@ def get_predictions():
         # Интерактивные поля для ввода данных
         input_data = {}
 
+        feature_names_ru = {
+            'MinTemp': 'Введите минимальную температуру в выбранный день: ',
+            'MaxTemp': 'Введите максимальную температуру в выбранный день: ',
+            'Rainfall': 'Введите количество осадков, выпавших за выбранный день (мм): ',
+            'Evaporation': 'Введите количество испарений в поддоне класса А (мм) за 24 часа до 9 утра выбранного дня: ',
+            'Sunshine': 'Введите количество часов яркого солнечного света в течение выбранного дня: ',
+            'WindSpeed9am': 'Введите скорость ветра в 9 утра выбранного дня (км/ч): ',
+            'WindSpeed3pm': 'Введите скорость ветра в 3 часа  после полудня выбранного дня (км/ч): ',
+            'WindGustSpeed': 'Введите скорость самого сильного порыва ветра за 24 часа до полуночи выбранного дня (км/ч): ',
+            'Humidity9am': 'Введите влажность в 9 утра выбранного дня (г/м3): ',
+            'Humidity3pm': 'Введите влажность в 3 часа после полудня выбранного дня (г/м3): ',
+            'Pressure9am': 'Введите давление в 9 утра выбранного дня (Па): ',
+            'Pressure3pm': 'Введите давление в 3 часа после полудня выбранного дня (Па): ',
+            'Cloud9am': 'Введите облачность в 9 утра выбранного дня (в % разделённых на 100): ',
+            'Cloud3pm': 'Введите облачность в 3 часа после полудня выбранного дня (в % разделённых на 100): ',
+            'Temp9am': 'Введите температуру в 9 утра выбранного дня: ',
+            'Temp3pm': 'Введите температуру в 3 часа после полудня выбранного дня: ',
+            'RainToday': 'Введите, был ли сегодня дождь или нет(1 - да, 0 - нет): ',
+            'Year': 'Введите текущий год: ',
+            'Month': 'Введите текущий месяц: ',
+            'Day': 'Введите текущий день: ',
+        }
+
         feature_names = ['MinTemp', 'MaxTemp', 'Rainfall', 'Evaporation', 'Sunshine', 'WindSpeed9am', 'WindSpeed3pm',
                          'WindGustSpeed', 'Humidity9am', 'Humidity3pm', 'Pressure9am', 'Pressure3pm', 'Cloud9am',
                          'Cloud3pm', 'Temp9am', 'Temp3pm', 'RainToday', 'Year', 'Month', 'Day']
 
-        feature_names_unique_validate = ['RainToday', 'Year', 'Month', 'Day']
+        input_data['Year'] = st.number_input(feature_names_ru.get('Year'), min_value=2000, max_value=2024, value=2024, step=1)
+        input_data['Month'] = st.number_input(feature_names_ru.get('Month'), min_value=1, max_value=12, value=1, step=1)
+        input_data['Day'] = st.number_input(feature_names_ru.get('Day'), min_value=1, max_value=31, value=15, step=1)
+        input_data['RainToday'] = st.number_input(feature_names_ru.get('RainToday'), min_value=0, max_value=1, value=0, step=1)
+        input_data['Rainfall'] = st.number_input(feature_names_ru.get('Rainfall'), min_value=0.0, value=0.0)
+        input_data['MinTemp'] = st.number_input(feature_names_ru.get('MinTemp'), value=0)
+        input_data['MaxTemp'] = st.number_input(feature_names_ru.get('MaxTemp'), value=0)
+        input_data['Temp9am'] = st.number_input(feature_names_ru.get('Temp9am'), value=0)
+        input_data['Temp3pm'] = st.number_input(feature_names_ru.get('Temp3pm'), value=0)
+        input_data['Evaporation'] = st.number_input(feature_names_ru.get('Evaporation'), min_value=0.0, value=0.0)
+
+        feature_names_unique_validate = ['RainToday', 'Year', 'Month', 'Day', 'Rainfall', 'MinTemp', 'MaxTemp',
+                                         'Temp9am', 'Temp3pm']
         for feature in feature_names:
             if feature not in feature_names_unique_validate:
-                input_data[feature] = st.number_input(f"{feature}", min_value=0, value=10)
+                input_data[feature] = st.number_input(f"{feature_names_ru.get(feature)}", min_value=0, value=10)
 
-        input_data['RainToday'] = st.number_input('RainToday', min_value=0, value=1, step=1)
-        input_data['Year'] = st.number_input('Year', min_value=2000, value=2024, step=1)
-        input_data['Month'] = st.number_input('Month', min_value=1, value=12, step=1)
-        input_data['Day'] = st.number_input('Day', min_value=1, value=31, step=1)
+
+
 
         if st.button('Сделать предсказание'):
             model1, model2, model3, model4, model5, model6 = get_models()
@@ -44,14 +77,21 @@ def get_predictions():
             predictions_ml5 = model5.predict(input_df)
             probabilities_ml6 = model6.predict(input_df)
             predictions_ml6 = np.argmax(probabilities_ml6, axis=1)
-            pred6 = "[Yes]" if predictions_ml6 == 1 else "[No]"
+
+            st.success(f"По предсказанию 1-й модели {'завтра будет дождь' if predictions_ml1 == 1 else 'завтра не будет дождя'}")
+            st.success(f"По предсказанию 2-й модели {'завтра будет дождь' if predictions_ml2 == 1 else 'завтра не будет дождя'}")
+            st.success(f"По предсказанию 3-й модели {'завтра будет дождь' if predictions_ml3 == 1 else 'завтра не будет дождя'}")
+            st.success(f"По предсказанию 4-й модели {'завтра будет дождь' if predictions_ml4 == 1 else 'завтра не будет дождя'}")
+            st.success(f"По предсказанию 5-й модели {'завтра будет дождь' if predictions_ml5 == 1 else 'завтра не будет дождя'}")
+            st.success(f"По предсказанию 6-й модели {'завтра будет дождь' if predictions_ml6 == 1 else 'завтра не будет дождя'}")
+            st.success(f"Более подробная информация: ")
 
             st.success(f"Предсказанние LogisticRegression: {predictions_ml1}")
             st.success(f"Предсказанние KMeans: {predictions_ml2}")
             st.success(f"Предсказанние GradientBoostingClassifier: {predictions_ml3}")
             st.success(f"Предсказанние BaggingClassifier: {predictions_ml4}")
             st.success(f"Предсказанние StackingClassifier: {predictions_ml5}")
-            st.success(f"Предсказанние Tensorflow: {pred6}")
+            st.success(f"Предсказанние Tensorflow: {predictions_ml6}")
     else:
         try:
             model1, model2, model3, model4, model5, model6 = get_models()
@@ -72,7 +112,6 @@ def get_predictions():
             accuracy_ml5 = accuracy_score(y_test, predictions_ml5)
 
             accuracy_ml6 = accuracy_score(y_test, predictions_ml6)
-
             st.success(f"Точность LogisticRegression: {accuracy_ml1}")
             st.success(f"Точность KMeans: {accuracy_ml2}")
             st.success(f"Rand Score GradientBoostingClassifier: {rand_score_ml3}")
